@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+  <title>Screen unlocked</title>
+  <script type="module">
+    const link = document.querySelector('link[rel="shortcut icon"]')
+
+    const ascii = x => URL.createObjectURL(new Blob([`
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+        <text x="50%" y="50%" font-size="32" text-anchor="middle" style="alignment-baseline: central;">${x}</text>
+      </svg>
+    `], {type: 'image/svg+xml'}))
+
+    const on = ascii('🔐')
+    const off = ascii('🔓')
+    link.href = off
+
+    const request = async () => {
+      const lock = await navigator.wakeLock.request()
+      link.href = on
+      document.title = 'Screen locked'
+      lock.onrelease = () => {
+        document.title = 'Screen unlocked'
+        link.href = off
+      }
+    }
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible') {
+        request()
+      }
+    })
+    request()
+  </script>
+</head>
+</html>
